@@ -120,3 +120,29 @@ def test_developer_demo_document_covers_hardware_and_evidence_boundaries():
     ]:
         assert fact in document
     assert "(docs/DEVELOPER_DEMO.md)" in readme
+
+
+def test_readme_documents_quick_start_flash_and_safety_limits():
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    for heading in [
+        "## 快速开始",
+        "## 页面",
+        "## 操作",
+        "## 硬件版本",
+        "## 软件结构",
+        "## 无线演示",
+        "## 测试",
+        "## 常见问题",
+        "## 证据边界",
+        "## 限制",
+    ]:
+        assert heading in readme
+    for target in [
+        ROOT / "docs/DEVELOPER_DEMO.md",
+        ROOT / "AGENTS.md",
+        ROOT / "LICENSES/fonts",
+    ]:
+        assert target.exists()
+    assert "erase-region 0xe000 0x2000" in readme
+    assert "V1.1.0-DEMO" in readme
