@@ -21,7 +21,7 @@
 
 - 屏幕全刷、快刷和刷新计数；
 - GSL1680 触摸坐标与三个实体键；
-- LM3630A 前光和 A4/A4 Lite 型号识别；
+- LM3630A 前光和国内/海外产品命名识别；
 - CW2015 或旧板 ADC 电量，以及充电检测；
 - PCF8563 RTC 只读时间；
 - SD 卡挂载和根目录统计；
@@ -41,11 +41,11 @@
 
 | 页面 | 文件 | 内容 |
 | --- | --- | --- |
-| Overview | `app_overview.c` | 型号、电源配置、固件、MAC、电量、RTC 和 SD 摘要 |
+| Overview | `app_overview.c` | 国内/海外型号、电源配置、固件、MAC、电量、RTC 和 SD 摘要 |
 | Display / Refresh | `app_display.c` | GC、DU 快刷、耗时和测试图案 |
 | Touch | `app_touch.c` | 原始/校准坐标、触点和触摸次数 |
 | Hardware Keys | `app_keys.c` | UP/DOWN/POWER 状态与次数 |
-| Frontlight | `app_frontlight.c` | A4/A4 Lite 判断和冷/暖双滑块 |
+| Frontlight | `app_frontlight.c` | A4 Pro/历史 A4 判断和冷/暖双滑块 |
 | Power / Battery | `app_power.c` | CW2015/ADC、充电、GPIO6 电源板型 |
 | RTC | `app_rtc.c` | PCF8563 只读日期时间 |
 | microSD | `app_sd.c` | 挂载和根目录只读列表 |
@@ -59,19 +59,28 @@
 - POWER：打开/关闭页面菜单；`Hardware Keys` 诊断页例外，POWER 用于采样本页状态；
 - 菜单内 UP/DOWN：移动高亮项，POWER：进入选中页面。
 
-## 2. 两个不同维度的硬件版本
+## 2. 硬件版本与国内/海外命名
 
-不要把“A4 / A4 Lite”与“新电源板 / 旧电源板”混为一谈。
+国内与海外产品命名并不完全对应。识别时必须同时读取：
 
-### A4 与 A4 Lite
+- LM3630A 前光控制器是否在线；
+- CW2015 新电源板是否存在。
 
-判断依据是 LM3630A 前光控制器是否实际应答：
+| 国内产品名 | 海外产品名 | 电源板 | 前光 |
+| --- | --- | --- | --- |
+| A4 Pro | A4 | CW2015 `0x62` | LM3630A `0x36` 在线 |
+| A4 Pro（无前光） | A4 Lite | CW2015 `0x62` | LM3630A `0x36` 不在线 |
+| A4 前光版（旧主板） | 历史机型 | 无 CW2015，GPIO10 ADC | LM3630A `0x36` 在线 |
+| A4（旧主板） | 历史机型 | 无 CW2015，GPIO10 ADC | LM3630A `0x36` 不在线 |
 
-- I2C 地址 `0x36` 可访问：`A4`；
-- I2C 地址 `0x36` 不存在：`A4 Lite`。
+对应关系：
 
-该判断只描述前光硬件。A4 也可能使用旧电源板，A4 Lite 也可能使用新电源板。
-演示页会在标题下同时显示前光型号和电源配置。
+- 海外 `A4 Lite` = 国内无前光的 `A4 Pro`；
+- 海外 `A4` = 国内 `A4 Pro`；
+- 不能只用“有无前光”判断国内产品名，因为前光只说明是否安装 LM3630A，
+  新 A4 Pro 和无前光 A4 Pro 都可能存在。
+
+界面中的 `A4 Pro / A4` 和 `A4 Pro / A4 Lite` 分别表示国内名 / 海外名。
 
 ### CW2015 电源板与 ADC 旧板
 
@@ -265,11 +274,11 @@ macOS 下把 `COM7` 替换为实际串口，例如 `/dev/cu.usbmodem...`。脚�
 
 1. 串口确认版本为 `V1.1.0-DEMO`，且登录出现 `developer_demo`；
 2. 用底栏箭头或 POWER 打开菜单，确认 10 个页面分两页显示且可切换；
-3. `Overview` 的 A4/A4 Lite 与实机前光硬件一致；
+3. `Overview` 显示 `A4 Pro / A4` 或 `A4 Pro / A4 Lite`，旧板显示历史 A4 命名；
 4. `Power / Battery` 的 CW2015/ADC 与已绑定电源板型一致；
 5. `Touch` 页显示原始和校准坐标，`Hardware Keys` 记录三键次数；
 6. `Display / Refresh` 的 GC、FAST、PATTERN 均可执行并显示耗时；
-7. A4 上分别拖动冷/暖两个滑块，检查亮度变化和百分比；A4 Lite 应显示未安装；
+7. 有前光的 A4 Pro 上拖动冷/暖两个滑块；无前光的 A4 Pro 应显示未安装；
 8. 插拔 USB 后 `Power / Battery` 的充电状态更新；
 9. 插入和拔出 microSD 后 remount 并检查根目录条目；
 10. `RTC` 页时间应持续更新且没有写 RTC 操作；

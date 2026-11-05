@@ -4,6 +4,7 @@
 #include "a4_board.h"
 #include "a4_sd.h"
 #include "devdemo_app.h"
+#include "devdemo_hardware_names.h"
 #include "devdemo_ui.h"
 #include "esp_app_desc.h"
 #include "esp_mac.h"
@@ -77,8 +78,10 @@ static void overview_render(devdemo_ctx_t *ctx)
 
     int y = devdemo_ui_section(ctx->fb, DEVDEMO_UI_CONTENT_TOP,
                                "HARDWARE PROFILE");
-    y = devdemo_ui_row(ctx->fb, y, "Model",
-                       s_snapshot.frontlight ? "A4" : "A4 Lite");
+    y = devdemo_ui_row(
+        ctx->fb, y, "Model",
+        devdemo_product_name(s_snapshot.frontlight,
+                             s_snapshot.switched_power));
     y = devdemo_ui_row(ctx->fb, y, "Power board",
                        s_snapshot.switched_power ? "CW2015 / switched"
                                                  : "ADC / legacy");

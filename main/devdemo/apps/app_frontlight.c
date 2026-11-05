@@ -3,6 +3,7 @@
 
 #include "a4_board.h"
 #include "devdemo_app.h"
+#include "devdemo_hardware_names.h"
 #include "devdemo_ui.h"
 
 enum {
@@ -13,6 +14,7 @@ enum {
 };
 
 static bool s_available;
+static bool s_a4_pro_power_board;
 static uint8_t s_level[FRONTLIGHT_CHANNEL_COUNT];
 static int8_t s_active_channel = -1;
 static bool s_write_ok = true;
@@ -64,6 +66,7 @@ static void frontlight_enter(devdemo_ctx_t *ctx)
 {
     (void)ctx;
     s_available = a4_board_has_frontlight();
+    s_a4_pro_power_board = a4_board_sd_power_can_suspend();
     s_active_channel = -1;
     s_write_ok = true;
 }
@@ -80,8 +83,9 @@ static void frontlight_render(devdemo_ctx_t *ctx)
     devdemo_ui_header(ctx->fb, "Frontlight",
                       "LM3630A dual-channel control @ I2C 0x36");
     int y = devdemo_ui_section(ctx->fb, DEVDEMO_UI_CONTENT_TOP, "HARDWARE");
-    y = devdemo_ui_row(ctx->fb, y, "Model",
-                       s_available ? "A4" : "A4 Lite");
+    y = devdemo_ui_row(
+        ctx->fb, y, "Model",
+        devdemo_product_name(s_available, s_a4_pro_power_board));
     y = devdemo_ui_row(ctx->fb, y, "Controller",
                        s_available ? "PRESENT" : "NOT FITTED");
     (void)devdemo_ui_row(ctx->fb, y, "Last write",
