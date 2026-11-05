@@ -83,19 +83,17 @@ def test_developer_demo_uses_page_registry_and_separate_apps():
     assert "&devdemo_app_ble" in registry
 
 
-def test_product_names_distinguish_domestic_and_overseas_models():
+def test_product_names_use_domestic_models_only():
     names = (ROOT / "main/devdemo/devdemo_hardware_names.h").read_text(
         encoding="utf-8"
     )
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     document = (ROOT / "docs/DEVELOPER_DEMO.md").read_text(encoding="utf-8")
 
-    assert '"A4 Pro / A4"' in names
-    assert '"A4 Pro / A4 Lite"' in names
+    assert 'return "A4 Pro";' in names
     assert '"A4 Frontlight"' in names
-    assert "海外 `A4 Lite` 对应国内 **无前光的 A4 Pro**" in readme
-    assert "海外 `A4` 对应国内 **A4 Pro**" in readme
-    assert "海外 `A4 Lite` = 国内无前光的 `A4 Pro`" in document
+    assert "新主板统一使用国内名称 **A4 Pro**" in readme
+    assert "新主板统一显示国内产品名 `A4 Pro`" in document
 
 
 def test_repository_contains_only_demo_components():
@@ -121,7 +119,7 @@ def test_developer_demo_document_covers_hardware_and_evidence_boundaries():
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
 
     for fact in [
-        "A4 Lite",
+        "A4 Pro",
         "CW2015",
         "PCF8563",
         "GPIO42",
